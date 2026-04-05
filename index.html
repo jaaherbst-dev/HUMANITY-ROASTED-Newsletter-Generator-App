@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUMANITY, ROASTED — Newsletter Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{background:#0D0D0D;color:#cccccc;font-family:'Barlow Condensed',Georgia,serif;min-height:100vh;line-height:1.6;}
+
+/* HEADER */
+header{background:#0D0D0D;border-bottom:3px solid #C4530A;padding:24px 20px 16px;text-align:center;}
+header h1{font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(2.4rem,9vw,4rem);color:#F5F0E8;letter-spacing:0.05em;line-height:1;}
+header p{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#C4530A;margin-top:5px;}
+
+/* CONTAINER */
+.container{max-width:700px;margin:0 auto;padding:24px 16px 80px;}
+
+/* CARD */
+.card{background:#111;border:1px solid #222;border-radius:4px;padding:20px;margin-bottom:18px;}
+
+/* API KEY */
+.api-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.api-row .field{flex:1;min-width:200px;}
+label.lbl{display:block;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#C4530A;margin-bottom:6px;}
+input[type=text],input[type=password],textarea,select{
+  background:#0D0D0D;border:1px solid #333;color:#F5F0E8;
+  padding:10px 12px;font-family:'Barlow Condensed',Georgia,serif;font-size:15px;
+  border-radius:3px;width:100%;
+}
+input[type=password]{letter-spacing:2px;}
+input:focus,textarea:focus,select:focus{outline:1px solid #C4530A;border-color:#C4530A;}
+select{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C4530A' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;
+}
+textarea{resize:vertical;min-height:80px;line-height:1.6;}
+
+/* CONTROLS ROW */
+.controls-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;}
+.field{flex:1;min-width:140px;}
+
+/* BUTTONS */
+.btn{font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:0.08em;border:none;border-radius:3px;cursor:pointer;padding:11px 22px;transition:opacity .15s;white-space:nowrap;font-size:1.05rem;}
+.btn:active{opacity:.8;}
+.btn-primary{background:#C4530A;color:#F5F0E8;font-size:1.15rem;}
+.btn-primary:disabled{background:#5a2a06;cursor:not-allowed;opacity:.6;}
+.btn-secondary{background:transparent;border:1px solid #333;color:#999;font-size:.9rem;padding:10px 18px;}
+.btn-secondary:hover{border-color:#555;color:#ccc;}
+.btn-sm{font-size:.8rem;padding:7px 14px;background:transparent;border:1px solid #333;color:#999;}
+.btn-sm:hover{border-color:#C4530A;color:#C4530A;}
+.btn-copy{background:#C4530A;color:#F5F0E8;font-size:.85rem;padding:8px 18px;}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+
+/* STATUS */
+.status{font-size:13px;min-height:20px;margin-bottom:12px;letter-spacing:.5px;}
+.status.go{color:#C4530A;animation:pulse 1.5s infinite;}
+.status.ok{color:#5a9e5a;}
+.status.err{color:#c0392b;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+/* FALLBACK */
+.fallback-box{background:#0a0a0a;border:1px solid #2a1a0a;border-radius:4px;padding:16px;margin-top:14px;}
+.fallback-box p{font-size:13px;color:#888;margin-bottom:10px;line-height:1.6;}
+.fallback-box textarea{min-height:100px;}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid #222;margin-bottom:0;}
+.tab{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;padding:10px 18px;cursor:pointer;border:none;background:none;color:#666;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;}
+.tab.active{color:#C4530A;border-bottom-color:#C4530A;}
+.tab-content{display:none;padding:20px;}
+.tab-content.active{display:block;}
+
+/* PREVIEW */
+.nl-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.pill{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:#1a1a1a;border:1px solid #2a2a2a;color:#888;}
+.pill.orange{border-color:#5a2a06;color:#C4530A;}
+.nl-subject{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:#F5F0E8;margin-bottom:4px;line-height:1.2;}
+.nl-preview-text{font-size:13px;color:#666;margin-bottom:4px;}
+.nl-ab{font-size:12px;color:#555;padding:6px 10px;background:#161616;border-radius:3px;margin-bottom:16px;border-left:2px solid #C4530A;}
+.sec-lbl{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:#C4530A;margin-bottom:8px;}
+.nl-opening{font-size:15px;line-height:1.85;color:#ccc;margin-bottom:20px;}
+.story{padding:14px 0;border-bottom:1px solid #1e1e1e;}
+.story:last-child{border-bottom:none;}
+.story-hl{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.5px;color:#F5F0E8;margin-bottom:5px;line-height:1.2;}
+.story-copy{font-size:14px;line-height:1.8;color:#999;}
+.story-src{font-size:11px;color:#444;margin-top:6px;font-style:italic;}
+.story-src a{color:#555;text-decoration:none;}
+.story-src a:hover{color:#C4530A;}
+.nl-closing{font-size:15px;line-height:1.85;color:#ccc;margin-top:16px;}
+.cta-preview{margin-top:18px;padding:14px;background:#1a0d06;border:1px solid #3a1a08;border-radius:3px;text-align:center;}
+.cta-preview .cta-txt{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#C4530A;}
+.cta-preview .cta-url{font-size:11px;color:#555;margin-top:3px;letter-spacing:1px;}
+.section-block{margin-bottom:20px;}
+
+/* RAW CODE */
+.code-block{background:#080808;border:1px solid #1a1a1a;border-radius:3px;padding:14px;font-family:monospace;font-size:11px;line-height:1.7;color:#888;overflow:auto;max-height:440px;white-space:pre-wrap;word-break:break-all;}
+.ml-note{font-size:12px;color:#666;padding:10px 14px;border-left:3px solid #C4530A;background:#0f0f0f;border-radius:0 3px 3px 0;margin-top:12px;line-height:1.7;}
+.ml-note code{color:#C4530A;background:#1a0d06;padding:1px 5px;border-radius:2px;}
+
+/* ARCHIVE */
+.archive-header{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding:4px 0;}
+.archive-header h3{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:#666;}
+.archive-header span{font-size:11px;color:#444;letter-spacing:1px;}
+.archive-list{margin-top:14px;}
+.archive-item{border-bottom:1px solid #1a1a1a;padding:12px 0;}
+.archive-item:last-child{border-bottom:none;}
+.archive-item-header{display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;gap:10px;}
+.archive-item-subject{font-size:14px;color:#ccc;flex:1;}
+.archive-item-date{font-size:11px;color:#444;letter-spacing:.5px;white-space:nowrap;}
+.archive-item-body{display:none;margin-top:10px;}
+.archive-item-body.open{display:block;}
+.archive-empty{font-size:13px;color:#444;font-style:italic;padding:10px 0;}
+.archive-hidden{display:none;}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid #1e1e1e;margin:18px 0;}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+  .controls-row{flex-direction:column;}
+  .api-row{flex-direction:column;}
+  .btn-primary{width:100%;}
+  .btn-row{flex-direction:column;}
+  .btn-row .btn{width:100%;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HUMANITY, ROASTED</h1>
+  <p>Newsletter Generator</p>
+</header>
+
+<div class="container">
+
+  <!-- API KEY -->
+  <div class="card">
+    <div class="api-row">
+      <div class="field">
+        <label class="lbl">Anthropic API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+      </div>
+      <button class="btn btn-secondary" onclick="toggleKey()">Show</button>
+    </div>
+    <p style="font-size:11px;color:#444;margin-top:8px;letter-spacing:.3px;">Key is stored in your browser only. Never sent anywhere except Anthropic's API.</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="card">
+    <div class="controls-row">
+      <div class="field">
+        <label class="lbl">Focus Topic</label>
+        <select id="focus">
+          <option value="general">General — whatever's burning</option>
+          <option value="politics">Politics &amp; institutions</option>
+          <option value="economy">Cost of living &amp; economy</option>
+          <option value="tech">Tech &amp; AI absurdity</option>
+          <option value="culture">Culture &amp; society</option>
+          <option value="environment">Climate &amp; environment</option>
+        </select>
+      </div>
+      <div class="field" style="max-width:130px;">
+        <label class="lbl">Stories</label>
+        <select id="storyCount">
+          <option value="3">3 stories</option>
+          <option value="4" selected>4 stories</option>
+          <option value="5">5 stories</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="genBtn" onclick="generate()">GENERATE NEWSLETTER</button>
+      <button class="btn btn-secondary" id="refreshBtn" onclick="refreshNews()">REFRESH NEWS</button>
+    </div>
+
+    <!-- FALLBACK -->
+    <div class="fallback-box" id="fallbackBox" style="display:none;">
+      <p>Couldn't fetch news automatically. Paste up to 5 headlines or article URLs below — one per line — and hit Generate.</p>
+      <label class="lbl">Paste headlines or URLs</label>
+      <textarea id="manualInput" placeholder="e.g. RBA holds interest rates as mortgage stress rises&#10;https://www.abc.net.au/news/..."></textarea>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status" id="status"></div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="card" id="outputPanel" style="display:none;padding:0;overflow:hidden;">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('preview',this)">Preview</button>
+      <button class="tab" onclick="switchTab('mailerlite',this)">MailerLite HTML</button>
+    </div>
+
+    <div class="tab-content active" id="tab-preview">
+      <div id="previewContent"></div>
+      <hr class="divider">
+      <div class="btn-row">
+        <button class="btn btn-copy" onclick="saveToArchive()">SAVE TO ARCHIVE</button>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-mailerlite">
+      <div class="code-block" id="mlCode"></div>
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn btn-copy" onclick="copyML()">COPY HTML</button>
+      </div>
+      <div class="ml-note">
+        Paste into MailerLite → Campaigns → Create → Custom HTML.<br>
+        <code>{$unsubscribe}</code> and <code>{$url}</code> are pre-wired as MailerLite merge tags.
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVE -->
+  <div class="card" id="archiveCard" style="margin-top:24px;">
+    <div class="archive-header" onclick="toggleArchive()">
+      <h3>ARCHIVE</h3>
+      <span id="archiveToggleLabel">SHOW ▾</span>
+    </div>
+    <div class="archive-hidden" id="archiveBody">
+      <div class="archive-list" id="archiveList"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const MODEL = 'claude-sonnet-4-20250514';
+const MAX_TOKENS = 2000;
+
+// CORS proxies — tried in order
+const PROXIES = [
+  'https://api.allorigins.win/get?url=',
+  'https://corsproxy.io/?',
+  'https://cors-anywhere.herokuapp.com/'
+];
+
+// News RSS feeds — AU focused
+const NEWS_FEEDS = {
+  general:     'https://www.abc.net.au/news/feed/51120/rss.xml',
+  politics:    'https://www.abc.net.au/news/feed/52278/rss.xml',
+  economy:     'https://www.abc.net.au/news/feed/52944/rss.xml',
+  tech:        'https://www.abc.net.au/news/feed/9892/rss.xml',
+  culture:     'https://www.abc.net.au/news/feed/52268/rss.xml',
+  environment: 'https://www.abc.net.au/news/feed/52345/rss.xml'
+};
+
+// Google News fallback queries
+const GNEWS_QUERIES = {
+  general:     'australia+news+today',
+  politics:    'australia+politics+government',
+  economy:     'australia+cost+of+living+economy',
+  tech:        'australia+technology+AI',
+  culture:     'australia+society+culture',
+  environment: 'australia+climate+environment'
+};
+
+// ── STATE ───────────────────────────────────────────────────
+let currentNewsletter = null;
+let currentML = '';
+let rawHeadlines = [];
+let archiveOpen = false;
+
+// ── HELPERS ─────────────────────────────────────────────────
+function getKey() {
+  return document.getElementById('apiKey').value.trim() ||
+         localStorage.getItem('hr_api_key') || '';
+}
+
+function saveKey(k) {
+  if (k) localStorage.setItem('hr_api_key', k);
+}
+
+function toggleKey() {
+  const inp = document.getElementById('apiKey');
+  const btn = event.target;
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+
+function getDate() {
+  return new Date().toLocaleDateString('en-AU', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function getIssueNum() {
+  const last = parseInt(localStorage.getItem('hr_issue_num') || '0');
+  const next = last + 1;
+  localStorage.setItem('hr_issue_num', next);
+  return next;
+}
+
+function stripHTML(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+// ── NEWS FETCH ───────────────────────────────────────────────
+async function fetchViaProxy(url) {
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(url), {signal: AbortSignal.timeout(8000)});
+      if (!res.ok) continue;
+      const data = await res.json();
+      // allorigins returns {contents:...}, others return raw
+      return data.contents || data;
+    } catch(e) {
+      continue;
+    }
+  }
+  return null;
+}
+
+async function parseRSS(xmlStr) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlStr, 'text/xml');
+  const items = Array.from(doc.querySelectorAll('item')).slice(0, 12);
+  return items.map(item => ({
+    title: item.querySelector('title')?.textContent?.trim() || '',
+    description: stripHTML(item.querySelector('description')?.textContent || '').slice(0, 300),
+    link: item.querySelector('link')?.textContent?.trim() || ''
+  })).filter(i => i.title.length > 10);
+}
+
+async function fetchNews(focus) {
+  setStatus('Fetching Australian news...', 'go');
+
+  // Try ABC News RSS first
+  const abcUrl = NEWS_FEEDS[focus] || NEWS_FEEDS.general;
+  let result = await fetchViaProxy(abcUrl);
+  if (result) {
+    const items = await parseRSS(typeof result === 'string' ? result : JSON.stringify(result));
+    if (items.length >= 3) return items;
+  }
+
+  // Try Google News RSS fallback
+  const query = GNEWS_QUERIES[focus] || GNEWS_QUERIES.general;
+  const gnUrl = `https://news.google.com/rss/search?q=${query}&hl=en-AU&gl=AU&ceid=AU:en`;
+  result = await fetchViaProxy(gnUrl);
+  if (result) {
+    const items = await parseRSS(typeof result === 'string' ? result : JSON.stringify(result));
+    if (items.length >= 3) return items;
+  }
+
+  return null;
+}
+
+// ── REFRESH NEWS ─────────────────────────────────────────────
+async function refreshNews() {
+  const focus = document.getElementById('focus').value;
+  const items = await fetchNews(focus);
+  if (items && items.length >= 3) {
+    rawHeadlines = items;
+    setStatus(`${items.length} stories fetched. Hit Generate.`, 'ok');
+    document.getElementById('fallbackBox').style.display = 'none';
+  } else {
+    setStatus('News fetch failed. Use manual input below.', 'err');
+    document.getElementById('fallbackBox').style.display = 'block';
+  }
+}
+
+// ── SYSTEM PROMPT ─────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are the content engine for HUMANITY, ROASTED — a premium Australian coffee brand built on dry wit, sardonic intelligence, and quiet defiance. You write the brand's bi-weekly newsletter.
+
+BRAND VOICE RULES:
+- Calm intelligence with sarcasm as survival strategy
+- Not angry — composed. The character who turned the news off, made a coffee, and got on with their day
+- Implicate broken systems first. Let the character opt out with quiet defiance
+- Dry observation over loud statement. Grounded over inspired. Honest over hopeful
+- No exclamation marks. No all-caps for emphasis. No preachy activism. No hustle clichés
+- No motivational poster energy. No performative rebellion
+- Test: "Would a smart, cynical adult who drinks good coffee and reads widely say this without cringing?" — if yes, it passes
+- We never name the enemy. We name the feeling.
+
+You will receive real Australian news headlines. Select the 3-5 most relevant for the HR audience — prioritise institutional failure, cost of living, political theatre, corporate absurdity, technology overreach, cultural absurdity. Avoid pure tragedy, crime, sport.
+
+Respond ONLY with a valid JSON object. No preamble, no markdown fences, no explanation. Raw JSON only:
+
+{
+  "subject": "short dry subject line, HR voice, no exclamation mark",
+  "subject_b": "A/B variant subject line, different angle, same voice",
+  "preview": "one punchy preview text line for email client",
+  "opening": "2-3 sentence editorial opener setting weekly mood — HR voice, no specific story names",
+  "stories": [
+    {
+      "original_headline": "real source headline verbatim",
+      "hr_headline": "rewritten in HR dry sardonic voice — observation not punchline",
+      "copy": "2-3 sentences HR voice. Name the system. End grounded or wry. No moralising.",
+      "source_url": "original article URL"
+    }
+  ],
+  "closing": "2-3 sentence sign-off — quiet defiance, references coffee or staying grounded, no motivational warmth",
+  "cta_line": "choose from: Get Some Coffee / Still Grounded / Yeah I Get It / Find Your Blend"
+}`;
+
+// ── BUILD USER PROMPT ─────────────────────────────────────────
+function buildUserPrompt(headlines, focus, count, date, issueNum) {
+  const focusLabels = {
+    general:'general Australian news',
+    politics:'Australian politics and institutional failures',
+    economy:'cost of living and economic pressure in Australia',
+    tech:'technology and AI affecting Australians',
+    culture:'Australian culture and society',
+    environment:'climate and environment in Australia'
+  };
+
+  let headlineBlock = '';
+  if (headlines && headlines.length > 0) {
+    headlineBlock = headlines.map((h,i) =>
+      `STORY ${i+1}:\nHEADLINE: ${h.title}\nSUMMARY: ${h.description || ''}\nURL: ${h.link || ''}`
+    ).join('\n---\n');
+  }
+
+  return `Today is ${date}. Issue #${issueNum} of the HUMANITY, ROASTED newsletter.
+Focus: ${focusLabels[focus] || 'general Australian news'}
+Stories requested: ${count}
+
+${headlineBlock ? 'Here are today\'s Australian news headlines:\n\n' + headlineBlock : 'No headlines provided — generate realistic, plausible Australian stories based on current patterns.'}
+
+Select the most HR-relevant stories, rewrite in brand voice, return the newsletter JSON.`;
+}
+
+// ── CALL ANTHROPIC API ────────────────────────────────────────
+async function callClaude(userPrompt, apiKey) {
+  const res = await fetch('https://hr-anthropic-proxy.jaaherbst.workers.dev', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+
+  const data = await res.json();
+  const text = data.content.map(b => b.type === 'text' ? b.text : '').join('');
+  const clean = text.replace(/```json|```/g, '').trim();
+  const match = clean.match(/\{[\s\S]*\}/);
+  if (!match) throw new Error('No JSON in response');
+  return JSON.parse(match[0]);
+}
+
+// ── MAIN GENERATE ─────────────────────────────────────────────
+// Callable headlessly: runFullGeneration('general', 4, 'sk-ant-...')
+async function runFullGeneration(focus, count, apiKey) {
+  const date = getDate();
+  const issueNum = getIssueNum();
+
+  // Get headlines
+  let headlines = rawHeadlines;
+  if (!headlines || headlines.length < 2) {
+    headlines = await fetchNews(focus) || [];
+  }
+
+  // Check manual input fallback
+  if (headlines.length < 2) {
+    const manual = document.getElementById('manualInput')?.value?.trim();
+    if (manual) {
+      headlines = manual.split('\n').filter(l => l.trim()).map(l => ({
+        title: l.trim(), description: '', link: l.startsWith('http') ? l.trim() : ''
+      }));
+    }
+  }
+
+  setStatus('Generating newsletter in HR voice...', 'go');
+
+  const userPrompt = buildUserPrompt(headlines, focus, count, date, issueNum);
+  const nl = await callClaude(userPrompt, apiKey);
+  nl._date = date;
+  nl._issueNum = issueNum;
+  nl._focus = focus;
+
+  return nl;
+}
+
+async function generate() {
+  const apiKey = getKey();
+  if (!apiKey) {
+    setStatus('Enter your Anthropic API key above.', 'err');
+    return;
+  }
+  saveKey(apiKey);
+
+  const focus = document.getElementById('focus').value;
+  const count = parseInt(document.getElementById('storyCount').value);
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+
+  document.getElementById('outputPanel').style.display = 'none';
+  document.getElementById('fallbackBox').style.display = 'none';
+
+  try {
+    const nl = await runFullGeneration(focus, count, apiKey);
+    currentNewsletter = nl;
+    currentML = buildMailerLiteHTML(nl);
+
+    renderPreview(nl);
+    document.getElementById('mlCode').textContent = currentML;
+    document.getElementById('outputPanel').style.display = 'block';
+    document.getElementById('outputPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+    setStatus('Issue #' + nl._issueNum + ' ready.', 'ok');
+    rawHeadlines = [];
+  } catch(e) {
+    console.error(e);
+    setStatus('Error: ' + e.message, 'err');
+    document.getElementById('fallbackBox').style.display = 'block';
+  }
+
+  btn.disabled = false;
+}
+
+// ── RENDER PREVIEW ────────────────────────────────────────────
+function renderPreview(nl) {
+  const stories = (nl.stories || []).map(s => `
+    <div class="story">
+      <div class="story-hl">${s.hr_headline || ''}</div>
+      <div class="story-copy">${s.copy || ''}</div>
+      <div class="story-src">Source: ${s.source_url
+        ? `<a href="${s.source_url}" target="_blank">${s.original_headline || s.source_url}</a>`
+        : (s.original_headline || '')}</div>
+    </div>`).join('');
+
+  document.getElementById('previewContent').innerHTML = `
+    <div class="nl-meta">
+      <span class="pill orange">Issue #${nl._issueNum}</span>
+      <span class="pill">${nl._date}</span>
+      <span class="pill">A/B Ready</span>
+    </div>
+    <div class="nl-subject">${nl.subject || ''}</div>
+    <div class="nl-preview-text">Preview: ${nl.preview || ''}</div>
+    ${nl.subject_b ? `<div class="nl-ab">A/B: ${nl.subject_b}</div>` : ''}
+
+    <div class="section-block">
+      <div class="sec-lbl">Opening</div>
+      <div class="nl-opening">${nl.opening || ''}</div>
+    </div>
+
+    <div class="section-block">
+      <div class="sec-lbl">This Week's Roast</div>
+      ${stories}
+    </div>
+
+    <div class="section-block">
+      <div class="sec-lbl">Still Grounded</div>
+      <div class="nl-closing">${nl.closing || ''}</div>
+    </div>
+
+    <div class="cta-preview">
+      <div class="cta-txt">${nl.cta_line || 'GET SOME COFFEE'}</div>
+      <div class="cta-url">humanityroasted.com</div>
+    </div>`;
+}
+
+// ── BUILD MAILERLITE HTML ─────────────────────────────────────
+function buildMailerLiteHTML(nl) {
+  const storyRows = (nl.stories || []).map(s => `
+    <tr>
+      <td style="padding:14px 0;border-bottom:1px solid #1e1e1e;">
+        <p style="font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:bold;color:#F5F0E8;margin:0 0 7px 0;line-height:1.3;">${s.hr_headline || ''}</p>
+        <p style="font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.85;color:#999999;margin:0 0 6px 0;">${s.copy || ''}</p>
+        ${s.original_headline ? `<p style="font-family:Georgia,serif;font-size:11px;color:#444444;font-style:italic;margin:0;">Source: ${s.source_url ? `<a href="${s.source_url}" style="color:#555555;">${s.original_headline}</a>` : s.original_headline}</p>` : ''}
+      </td>
+    </tr>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>${(nl.subject || 'HUMANITY, ROASTED').replace(/</g,'&lt;')}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0D0D0D;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;background-color:#0D0D0D;">
+  <tr>
+    <td style="text-align:center;padding:8px 0;font-family:Georgia,serif;font-size:11px;color:#555555;">
+      <a href="{$url}" style="color:#555555;text-decoration:underline;">View in browser</a>
+    </td>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;">
+  <tr>
+    <td align="center" style="padding:24px 16px;">
+      <table width="580" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;width:100%;">
+
+        <!-- HEADER -->
+        <tr>
+          <td style="padding:0 0 18px 0;border-bottom:3px solid #C4530A;">
+            <p style="font-family:Georgia,serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#555555;margin:0 0 8px 0;">The bi-weekly newsletter</p>
+            <p style="font-family:Impact,Haettenschweiler,'Arial Narrow',sans-serif;font-size:36px;letter-spacing:4px;color:#F5F0E8;margin:0;line-height:1;">HUMANITY, ROASTED</p>
+            <p style="font-family:Georgia,serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#555555;margin:8px 0 0 0;">Issue #${nl._issueNum || ''} &nbsp;&bull;&nbsp; ${nl._date || ''}</p>
+          </td>
+        </tr>
+
+        <!-- OPENING -->
+        <tr>
+          <td style="padding:20px 0 18px 0;border-bottom:1px solid #1e1e1e;">
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.9;color:#cccccc;margin:0;">${nl.opening || ''}</p>
+          </td>
+        </tr>
+
+        <!-- SECTION LABEL -->
+        <tr>
+          <td style="padding:16px 0 4px 0;">
+            <p style="font-family:Georgia,serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C4530A;margin:0;">This Week&#8217;s Roast</p>
+          </td>
+        </tr>
+
+        <!-- STORIES -->
+        ${storyRows}
+
+        <!-- CLOSING -->
+        <tr>
+          <td style="padding:20px 0 0 0;border-top:1px solid #1e1e1e;margin-top:4px;">
+            <p style="font-family:Georgia,serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C4530A;margin:0 0 10px 0;">Still Grounded</p>
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.9;color:#cccccc;margin:0;">${nl.closing || ''}</p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:28px 0;text-align:center;">
+            <a href="https://humanityroasted.com" target="_blank" style="display:inline-block;background-color:#C4530A;color:#F5F0E8;font-family:Impact,Haettenschweiler,'Arial Narrow',sans-serif;font-size:20px;letter-spacing:4px;text-decoration:none;padding:14px 40px;border-radius:3px;">${nl.cta_line || 'GET SOME COFFEE'}</a>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="padding:18px 0;border-top:1px solid #1a1a1a;text-align:center;">
+            <p style="font-family:Georgia,serif;font-size:11px;color:#444444;line-height:1.8;margin:0;">
+              The world&#8217;s on fire. We&#8217;re still making good coffee.<br>
+              <a href="{$unsubscribe}" style="color:#666666;text-decoration:underline;">Unsubscribe</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>`;
+}
+
+// ── TAB SWITCH ────────────────────────────────────────────────
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ── COPY HTML ─────────────────────────────────────────────────
+function copyML() {
+  navigator.clipboard.writeText(currentML).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'COPIED';
+    setTimeout(() => btn.textContent = orig, 1800);
+  }).catch(() => {
+    // Fallback for mobile
+    const ta = document.createElement('textarea');
+    ta.value = currentML;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  });
+}
+
+// ── ARCHIVE ───────────────────────────────────────────────────
+function saveToArchive() {
+  if (!currentNewsletter) return;
+  const archive = JSON.parse(localStorage.getItem('hr_archive') || '[]');
+  archive.unshift({
+    id: Date.now(),
+    date: currentNewsletter._date,
+    issueNum: currentNewsletter._issueNum,
+    subject: currentNewsletter.subject,
+    preview: currentNewsletter.preview,
+    nl: currentNewsletter,
+    ml: currentML
+  });
+  // Keep last 50
+  if (archive.length > 50) archive.splice(50);
+  localStorage.setItem('hr_archive', JSON.stringify(archive));
+  renderArchive();
+  const btn = event.target;
+  btn.textContent = 'SAVED';
+  setTimeout(() => btn.textContent = 'SAVE TO ARCHIVE', 1800);
+}
+
+function renderArchive() {
+  const archive = JSON.parse(localStorage.getItem('hr_archive') || '[]');
+  const list = document.getElementById('archiveList');
+  if (archive.length === 0) {
+    list.innerHTML = '<div class="archive-empty">No saved issues yet.</div>';
+    return;
+  }
+  list.innerHTML = archive.map((item, idx) => `
+    <div class="archive-item">
+      <div class="archive-item-header" onclick="toggleArchiveItem(${idx})">
+        <div>
+          <span class="pill orange" style="margin-right:8px;">Issue #${item.issueNum}</span>
+          <span class="archive-item-subject">${item.subject || ''}</span>
+        </div>
+        <div class="archive-item-date">${item.date || ''}</div>
+      </div>
+      <div class="archive-item-body" id="archive-item-${idx}">
+        <p style="font-size:13px;color:#666;margin:10px 0 12px;">${item.preview || ''}</p>
+        <div class="btn-row">
+          <button class="btn btn-copy btn-sm" onclick="loadFromArchive(${idx})">LOAD</button>
+          <button class="btn btn-sm" onclick="copyArchiveML(${idx})">COPY HTML</button>
+          <button class="btn btn-sm" style="color:#c0392b;border-color:#3a1a1a;" onclick="deleteArchiveItem(${idx})">DELETE</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleArchiveItem(idx) {
+  const body = document.getElementById('archive-item-' + idx);
+  body.classList.toggle('open');
+}
+
+function loadFromArchive(idx) {
+  const archive = JSON.parse(localStorage.getItem('hr_archive') || '[]');
+  const item = archive[idx];
+  if (!item) return;
+  currentNewsletter = item.nl;
+  currentML = item.ml;
+  renderPreview(item.nl);
+  document.getElementById('mlCode').textContent = item.ml;
+  document.getElementById('outputPanel').style.display = 'block';
+  switchTab('preview', document.querySelector('.tab'));
+  document.getElementById('outputPanel').scrollIntoView({behavior:'smooth'});
+  setStatus('Loaded Issue #' + item.issueNum, 'ok');
+}
+
+function copyArchiveML(idx) {
+  const archive = JSON.parse(localStorage.getItem('hr_archive') || '[]');
+  const item = archive[idx];
+  if (!item) return;
+  navigator.clipboard.writeText(item.ml).then(() => {
+    setStatus('HTML copied.', 'ok');
+  });
+}
+
+function deleteArchiveItem(idx) {
+  const archive = JSON.parse(localStorage.getItem('hr_archive') || '[]');
+  archive.splice(idx, 1);
+  localStorage.setItem('hr_archive', JSON.stringify(archive));
+  renderArchive();
+}
+
+function toggleArchive() {
+  archiveOpen = !archiveOpen;
+  document.getElementById('archiveBody').classList.toggle('archive-hidden', !archiveOpen);
+  document.getElementById('archiveToggleLabel').textContent = archiveOpen ? 'HIDE ▴' : 'SHOW ▾';
+  if (archiveOpen) renderArchive();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Restore saved API key
+  const saved = localStorage.getItem('hr_api_key');
+  if (saved) document.getElementById('apiKey').value = saved;
+
+  // Save key on change
+  document.getElementById('apiKey').addEventListener('change', e => saveKey(e.target.value.trim()));
+});
+</script>
+</body>
+</html>
